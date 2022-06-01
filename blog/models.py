@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-#from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class Note(models.Model):
@@ -9,14 +9,15 @@ class Note(models.Model):
     public = models.BooleanField(default=False, verbose_name='Опубликовать')
     create_at = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
     update_at = models.DateTimeField(auto_now=True, verbose_name='Время обновления')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
         #return f"Запись №{self.id}" #Т.е. можем перегрузить вывод как угодно
 
     class Meta:
-        verbose_name = "Сообщение"
+        #verbose_name = "Сообщение"
+        verbose_name = _("Сообщение") # Можно и так через gettext_lazzy as _
         verbose_name_plural = "Сообщения"
         ordering = ['id']
 
@@ -30,8 +31,9 @@ class Comment(models.Model):
         GOOD = 4, "Хорошо"
         EXCELLENT = 5, "Отлично"
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, verbose_name="Автор")
-    note = models.ForeignKey(Note, on_delete=models.CASCADE, null = True, verbose_name="Сообщение")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Автор")
+    note = models.ForeignKey(Note, on_delete=models.CASCADE,
+                             verbose_name="Сообщение", related_name='comments')
     rating = models.IntegerField(default=Rating.WITHOUT_RATING, choices=Rating.choices, verbose_name="Оценка")
 
     def __str__(self):
